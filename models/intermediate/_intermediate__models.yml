@@ -1,0 +1,68 @@
+version: 2
+
+models:
+  - name: int_trips_unioned
+    description: "Unified trip data combining green and yellow taxi records into a single fact-style table for downstream analysis."
+    columns:
+      - name: vendorid
+        description: "Identifier for the taxi vendor providing the trip record."
+
+      - name: ratecodeid
+        description: "Rate code identifier for the trip, such as standard, negotiated fare, or group ride."
+
+      - name: pickup_locationid
+        description: "Taxi zone identifier for the pickup location."
+
+      - name: dropoff_locationid
+        description: "Taxi zone identifier for the dropoff location."
+
+      - name: pickup_datetime
+        description: "Timestamp when the trip pickup occurred."
+
+      - name: dropoff_datetime
+        description: "Timestamp when the trip dropoff occurred."
+
+      - name: store_and_fwd_flag
+        description: "Flag indicating whether the trip record was stored and forwarded before being sent to the vendor."
+
+      - name: passenger_count
+        description: "Number of passengers recorded for the trip."
+
+      - name: trip_distance
+        description: "Distance traveled during the trip, measured in miles."
+
+      - name: trip_type
+        description: "Trip type code, normalized across both green and yellow taxi data sources."
+
+      - name: fare_amount
+        description: "Base fare charged for the trip before additional fees and surcharges."
+
+      - name: extra
+        description: "Additional amount charged outside the base fare, such as extras and surcharges."
+
+      - name: mta_tax
+        description: "MTA tax amount included in the trip fare."
+
+      - name: tip_amount
+        description: "Tip amount provided by the passenger."
+
+      - name: tolls_amount
+        description: "Total toll charges incurred during the trip."
+
+      - name: ehail_fee
+        description: "e-hail fee amount, if present, normalized to zero for yellow taxi records where the field is not available."
+
+      - name: improvement_surcharge
+        description: "Additional surcharge applied to support transportation improvements."
+
+      - name: total_amount
+        description: "Final total fare including base fare, extras, taxes, tips, tolls, and surcharges."
+
+      - name: payment_type
+        description: "Numeric payment type code associated with the trip."
+
+      - name: payment_type_description
+        description: "Human-readable description of the payment method used for the fare."
+
+      - name: service_type
+        description: "Source service label indicating whether the trip came from green or yellow taxi data."

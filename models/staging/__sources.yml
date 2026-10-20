@@ -1,0 +1,19 @@
+## ref: https://docs.getdbt.com/docs/build/sources
+sources:
+  - name: staging # the name models will use to refer the table
+    database: "{{ target.project }}" # Or hardcoded name of your GCP project
+    schema: "{{ target.dataset }}" # Or hardcoded name of your BigQuery dataset
+
+    tables:
+      - name: green_tripdata_all_partitioned
+        loaded_at_field: lpep_pickup_datetime
+        freshness:
+          warn_after: {count: 6, period: hour}
+          error_after: {count: 12, period: hour}
+      - name: yellow_tripdata_all_partitioned	
+        loaded_at_field: tpep_pickup_datetime
+        freshness:
+          warn_after: {count: 6, period: hour}
+          error_after: {count: 12, period: hour}
+
+# uv run dbt source freshness

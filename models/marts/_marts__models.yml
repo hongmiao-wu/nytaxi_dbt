@@ -1,0 +1,26 @@
+version: 2
+
+models:
+  - name: dim_zones
+    description: "Dimension table containing NYC taxi zone metadata used to interpret pickup and dropoff locations."
+    columns:
+      - name: location_id
+        description: "Unique identifier for the taxi zone."
+
+      - name: borough
+        description: "Borough name associated with the taxi zone."
+
+      - name: zone
+        description: "Neighborhood or zone name within the borough."
+
+      - name: service_zone
+        description: "Service area classification for the zone, such as EWR, Boro, or Yellow."
+  
+  - name: fct_trips
+    description: "Fact table containing detailed trip records for both green and yellow taxis, enriched with payment type information."
+    columns:
+      - name: trip_id
+        description: "surrogate primary key identifier for each trip record."
+        data_tests:
+          - unique
+          - not_null
