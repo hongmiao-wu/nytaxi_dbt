@@ -25,22 +25,7 @@ Then run uv run dbt deps to install the package.
 Then we can use the generate_surrogate_key macro to create a unique trip_id for each trip.
 */
 
-{{ config(materialized='table') }}
-
-with keyed as (
-    select
-        {{ dbt_utils.generate_surrogate_key([
-            'service_type',
-            'vendorid',
-            'pickup_datetime',
-            'dropoff_datetime',
-            'pickup_locationid',
-            'dropoff_locationid'
-        ]) }} as trip_id,
-        *
-    from {{ ref('int_trips_unioned') }}
-),
-
+-- moved to int_trips_keyed.sql
 
 /*
 Step 2: Find and fix duplicates
@@ -82,7 +67,7 @@ exact copies: 67
 same key different rows: 264773
 
 Step 2.3: For those exact copies, we can just keep one of them.  
-*/
+
 
 -- remove exact copies (rows identical in every column)
 exact_copies_removed as (
@@ -91,7 +76,7 @@ exact_copies_removed as (
 )
 
 select * from exact_copies_removed
-/*
+
 
 
 For those with the same key but different rows, we need to investigate further to see which one to keep.
@@ -150,6 +135,92 @@ order by _groups desc
 limit 10;
 '''
 Out of about 264,840 duplicate groups, 264,177 (roughly 99.7%) are exactly one positive row and one negative row, 
-which fits an original trip plus its reversal (a refund or dispute). The rest are small side cases:
+which fits an original trip plus its reversal (a refund or dispute). The rest are small side cases.
+
+'''
+with dup_keys as (
+    select trip_id
+    from `dte-course-509515.nytaxi_dataset.fct_trips`
+    group by trip_id
+    having count(*) > 1
+)
+
+select
+    '1. all rows' as scope,
+    count(*) as n_rows,
+    round(sum(fare_amount), 2) as fare_sum,
+    round(sum(total_amount), 2) as total_sum
+from `dte-course-509515.nytaxi_dataset.fct_trips`
+
+union all
+
+select
+    '2. rows with duplicate keys',
+    count(*),
+    round(sum(fare_amount), 2),
+    round(sum(total_amount), 2)
+from `dte-course-509515.nytaxi_dataset.fct_trips`
+where trip_id in (select trip_id from dup_keys)
+
+union all
+
+select
+    '3. duplicate-key rows with positive fare',
+    count(*),
+    round(sum(fare_amount), 2),
+    round(sum(total_amount), 2)
+from `dte-course-509515.nytaxi_dataset.fct_trips`
+where trip_id in (select trip_id from dup_keys)
+  and fare_amount > 0
+
+order by scope;
+'''
+
+here is the result:
+
+
+```json
+[{
+  "scope": "1. all rows",
+  "n_rows": "114827139",
+  "fare_sum": "1497102656.91",
+  "total_sum": "2140449836.27"
+}, {
+  "scope": "2. rows with duplicate keys",
+  "n_rows": "529557",
+  "fare_sum": "4557.4",
+  "total_sum": "12190.9"
+}, {
+  "scope": "3. duplicate-key rows with positive fare",
+  "n_rows": "264819",
+  "fare_sum": "2860410.56",
+  "total_sum": "3662768.35"
+}]
+```
+
 
 */
+
+{{ config(materialized='table') }}
+
+with ranked as (
+    select
+        *,
+        count(*) over (partition by trip_id) as rows_in_group,
+        countif(fare_amount < 0) over (partition by trip_id) as negative_rows,
+        row_number() over (
+            partition by trip_id
+            order by fare_amount desc, total_amount desc, payment_type
+        ) as rn
+    from {{ ref('int_trips_keyed') }}
+)
+
+select
+    * except (rows_in_group, negative_rows, rn)
+    replace (
+        if(negative_rows > 0, 0, fare_amount) as fare_amount,
+        if(negative_rows > 0, 0, total_amount) as total_amount
+    ),
+    rows_in_group > 1 as had_duplicates
+from ranked
+where rn = 1
