@@ -19,6 +19,7 @@ with green_tripdata as (
         tolls_amount,
         ehail_fee,
         improvement_surcharge,
+        congestion_surcharge,
         total_amount,
         payment_type,
         payment_type_description,
@@ -45,6 +46,7 @@ yellow_tripdata as (
         tolls_amount,
         cast(0 as numeric) as ehail_fee,      -- 2. extra column, missing in yellow
         improvement_surcharge,
+        congestion_surcharge,
         total_amount,
         payment_type,
         payment_type_description,
