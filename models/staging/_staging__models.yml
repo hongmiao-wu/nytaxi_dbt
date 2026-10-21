@@ -1,0 +1,108 @@
+version: 2
+
+models:
+  - name: stg_green_tripdata
+    description: "Staging model for green taxi trip records with cleaned and typed fields for downstream transformations."
+    columns:
+      - name: vendorid
+        description: "Identifier for the taxi vendor."
+      - name: ratecodeid
+        description: "Rate code associated with the trip."
+      - name: pickup_locationid
+        description: "Pickup taxi zone ID."
+      - name: dropoff_locationid
+        description: "Dropoff taxi zone ID."
+      - name: pickup_datetime
+        description: "Pickup timestamp for the trip."
+      - name: dropoff_datetime
+        description: "Dropoff timestamp for the trip."
+      - name: store_and_fwd_flag
+        description: "Flag indicating whether the trip record was stored and forwarded."
+      - name: passenger_count
+        description: "Number of passengers reported for the trip."
+      - name: trip_distance
+        description: "Trip distance in miles."
+      - name: trip_type
+        description: "Trip type indicator."
+      - name: fare_amount
+        description: "Base fare amount."
+      - name: extra
+        description: "Additional fare amount."
+      - name: mta_tax
+        description: "MTA tax component."
+      - name: tip_amount
+        description: "Passenger tip amount."
+      - name: tolls_amount
+        description: "Total toll charges."
+      - name: ehail_fee
+        description: "E-hail fee amount."
+      - name: improvement_surcharge
+        description: "Surcharge added to the trip fare."
+      - name: congestion_surcharge
+        description: "Congestion surcharge amount."
+      - name: total_amount
+        description: "Final total trip fare."
+      - name: payment_type
+        description: "Payment type code."
+      - name: payment_type_description
+        description: "Human-readable payment type description."
+
+  - name: stg_yellow_tripdata
+    description: "Staging model for yellow taxi trip records with standardized fields and payment metadata."
+    columns:
+      - name: vendorid
+        description: "Identifier for the taxi vendor."
+      - name: ratecodeid
+        description: "Rate code associated with the trip."
+      - name: pickup_locationid
+        description: "Pickup taxi zone ID."
+      - name: dropoff_locationid
+        description: "Dropoff taxi zone ID."
+      - name: pickup_datetime
+        description: "Pickup timestamp for the trip."
+      - name: dropoff_datetime
+        description: "Dropoff timestamp for the trip."
+      - name: store_and_fwd_flag
+        description: "Flag indicating whether the trip record was stored and forwarded."
+      - name: passenger_count
+        description: "Number of passengers reported for the trip."
+      - name: trip_distance
+        description: "Trip distance in miles."
+      - name: fare_amount
+        description: "Base fare amount."
+      - name: extra
+        description: "Additional fare amount."
+      - name: mta_tax
+        description: "MTA tax component."
+      - name: tip_amount
+        description: "Passenger tip amount."
+      - name: tolls_amount
+        description: "Total toll charges."
+      - name: improvement_surcharge
+        description: "Surcharge added to the trip fare."
+      - name: congestion_surcharge
+        description: "Congestion surcharge amount."
+      - name: total_amount
+        description: "Final total trip fare."
+      - name: payment_type
+        description: "Payment type code."
+      - name: payment_type_description
+        description: "Human-readable payment type description."
+
+  - name: stg_fhv_tripdata
+    description: "Staging model for FHV trip records, with null-dispatch records removed and fields normalized for downstream use."
+    columns:
+      - name: dispatching_base_num
+        description: "Base number that dispatched the trip."
+      - name: pickup_datetime
+        description: "Pickup timestamp for the trip."
+      - name: dropoff_datetime
+        description: "Dropoff timestamp for the trip."
+      - name: pickup_location_id
+        description: "Pickup location ID from the source taxi zone reference."
+      - name: dropoff_location_id
+        description: "Dropoff location ID from the source taxi zone reference."
+      - name: sr_flag
+        description: "Shared ride flag from the source data."
+      - name: affiliated_base_number
+        description: "Affiliated base number associated with the trip."

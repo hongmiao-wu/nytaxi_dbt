@@ -24,3 +24,11 @@ models:
         data_tests:
           - unique
           - not_null
+    # columns:
+    #   - name: payment_type
+    #     description: "Type of payment made for the trip."
+    #     data_tests:
+    #       - accepted_values:
+    #           arguments:
+    #             values: [1, 2, 3, 4, 5]
+    #             quote: false
